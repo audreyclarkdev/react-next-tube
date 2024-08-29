@@ -1,95 +1,49 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+import { useState } from 'react';
+import { SearchBar } from './components/SearchBar';
+import { VideoDetail } from './components/VideoDetail';
+import { VideoList } from './components/VideoList';
+import axios from 'axios';
+const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
 
 export default function Home() {
+  const [videos, setVideos] = useState([]);
+	const [selectedVideo, setSelectedVideo] = useState(null);
+
+  const onVideoSelect = (selectedVideo) => {
+    setSelectedVideo(selectedVideo);
+  };
+
+  const videoSearch = (term) => {
+    const url = 'https://www.googleapis.com/youtube/v3/search';
+
+    const params = {
+      part: 'snippet',
+      key: API_KEY,
+      q: term,
+      type: 'video',
+    };
+
+    if (term.length >= 3){
+      axios
+        //.get('./data.json', { params })
+        .get(url, { params })
+        .then((response) => {
+          console.log(response.data.items);
+          setVideos(response.data.items);
+          setSelectedVideo(response.data.items[0]);
+        })
+        .catch((error) => { 
+          console.error(error);
+        });
+    }
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <div className='row justify-content-center'>
+      <SearchBar onSearchTermChange={videoSearch} />
+      <VideoDetail video={selectedVideo} />
+      <VideoList videos={videos} onVideoSelect={onVideoSelect} />
+    </div>
   );
-}
+};
