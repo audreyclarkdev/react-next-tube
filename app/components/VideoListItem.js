@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image'
 
 export const VideoListItem = ({ video, onVideoSelect }) => {
 
@@ -10,7 +11,7 @@ export const VideoListItem = ({ video, onVideoSelect }) => {
     <li onClick={() => onVideoSelect(video)} className='list-group-item'>
       <div className='video-list-media'>
         <div className='media-left'>
-          <img className='media-object' src={imageUrl} alt='media' />
+          <Image className='media-object' src={imageUrl} alt='screengrab of video' />
         </div>
         <div className='media-body'>
           <div className='media-heading'>{video.snippet.title}</div>
